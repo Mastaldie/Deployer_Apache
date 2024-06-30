@@ -1,0 +1,33 @@
+#Installer et activer httpd : pour le serveur web
+sudo yum -y install httpd 
+sudo systemctl start httpd
+
+#Installer et activation automatique de php 
+sudo yum -y install php php-cli
+
+#Ecrire le script et le placer dans /var/www/html/ 
+cd /var/www/html
+# script index.php
+sudo nano index.php
+<?php
+// index.php - Page d'accueil
+echo "Je suis dans le home";
+?>
+
+# script help.php site et on y insère le script de journalisation et le place dans un fichier
+sudo nano help.php
+<?php
+// help.php - Page d'aide
+echo "Je suis dans help";
+
+// Journalisation dans un fichier
+$logMessage = "Accès à la page help - " . date("Y-m-d H:i:s") . "\n";
+file_put_contents("/home/ec2-user/journal-php.log", $logMessage, FILE_APPEND);
+?>
+
+
+#Restart le httpd 
+sudo systemctl restart httpd
+
+#Journaliser le tout dans mon journal en background et recuperer les erreurs
+sudo tail -f -n 1 /var/log/php-fpm/www-error.log >> /home/ec2-user/journal-php.log &
